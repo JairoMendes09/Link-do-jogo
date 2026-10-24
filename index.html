@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criador de Jogos 2026</title>
+<meta name="description" content="Fragmentos de Outro Mundo - RPG 2D indie. Jogue grátis e siga o projeto.">
+<meta property="og:title" content="Fragmentos de Outro Mundo">
+<meta property="og:description" content="RPG 2D indie criado com ajuda de IA. Jogue grátis!">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1a2e;
+    --panel: rgba(27,47,34,.84);
+    --panel-hi: rgba(39,66,50,.9);
+    --border: #3d6b4a;
+    --text: #e8f3e6;
+    --muted: #b7cfbb;
+    --red: rgba(196,38,46,.92);
+    --red-hi: rgba(224,58,67,.95);
+    --gold: #e6b84a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body {
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    justify-content: center;
+    padding: 36px 16px 48px;
+  }
+  svg { image-rendering: pixelated; shape-rendering: crispEdges; }
+
+  /* ---------- Fundo em vídeo: Ilha Celeste ---------- */
+  #bgv {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    object-fit: cover;
+    z-index: 0;
+    background: #0d1f14;
+  }
+  .veil {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(5,14,12,.55) 0%, rgba(5,14,12,.18) 38%, rgba(5,14,12,.38) 100%);
+  }
+
+  main { width: 100%; max-width: 440px; text-align: center; position: relative; z-index: 2; }
+
+  /* ---------- Avatar ---------- */
+  .avatar-wrap { position: relative; width: 128px; margin: 0 auto 22px; animation: float 3s steps(6) infinite; }
+  .avatar {
+    position: relative;
+    width: 128px; height: 128px;
+    background: radial-gradient(circle at 50% 40%, #234030, #0f1c14);
+    border: 4px solid var(--gold);
+    box-shadow: 0 0 0 4px #000, 8px 8px 0 4px #000, 0 0 24px rgba(230,184,74,.35);
+    display: grid; place-items: center;
+    overflow: hidden;
+  }
+  .avatar svg { width: 80%; height: 80%; }
+  .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+  .corner { position: absolute; width: 10px; height: 10px; background: var(--gold); box-shadow: 0 0 0 3px #000; }
+  .corner.tl { top: -9px; left: -9px; } .corner.tr { top: -9px; right: -9px; }
+  .corner.bl { bottom: -9px; left: -9px; } .corner.br { bottom: -9px; right: -9px; }
+
+  h1 { font-size: 17px; line-height: 1.7; color: var(--gold); text-shadow: 3px 3px 0 #000, 0 0 18px rgba(230,184,74,.4); }
+  .tag { margin: 14px 0 18px; font-size: 9px; line-height: 2; color: #dbeadb; text-shadow: 2px 2px 0 #000; }
+
+  /* ---------- Barra de status ---------- */
+  .status { margin: 0 auto 28px; max-width: 300px; font-size: 8px; text-align: left; color: #dbeadb; text-shadow: 2px 2px 0 #000; }
+  .status .row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .bar { height: 14px; background: #000; border: 3px solid #000; outline: 2px solid var(--border); position: relative; overflow: hidden; }
+  .bar i {
+    display: block; height: 100%; width: 70%;
+    background: repeating-linear-gradient(90deg, var(--red) 0 8px, var(--red-hi) 8px 10px);
+    animation: fill 1.4s steps(14) both;
+  }
+
+  /* ---------- Botões ---------- */
+  .links { display: flex; flex-direction: column; gap: 20px; }
+  .btn {
+    --btn-bg: var(--panel);
+    display: grid;
+    grid-template-columns: 44px 1fr 20px;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 14px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--btn-bg);
+    border: 4px solid var(--border);
+    box-shadow: 6px 6px 0 #000, inset 0 -6px 0 rgba(0,0,0,.25), inset 0 4px 0 rgba(255,255,255,.07);
+    transition: transform .08s, box-shadow .08s, background .08s;
+    animation: pop .5s steps(5) both;
+  }
+  .btn:nth-child(2) { animation-delay: .1s; }
+  .btn:nth-child(3) { animation-delay: .2s; }
+  .btn:hover, .btn:focus-visible {
+    --btn-bg: var(--panel-hi);
+    border-color: var(--gold);
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0 #000, inset 0 -6px 0 rgba(0,0,0,.25), inset 0 4px 0 rgba(255,255,255,.07);
+    outline: none;
+  }
+  .btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 #000; }
+  .btn .ico { width: 44px; height: 44px; display: grid; place-items: center; background: #0d1a12; border: 3px solid #000; outline: 2px solid var(--border); }
+  .btn .ico svg { width: 28px; height: 28px; fill: currentColor; }
+  .btn .cut { fill: #0d1a12; }
+  .btn small { display: block; margin-top: 7px; font-size: 8px; color: var(--muted); }
+  .btn .arrow { width: 14px; height: 14px; fill: var(--gold); transition: transform .1s; }
+  .btn:hover .arrow, .btn:focus-visible .arrow { transform: translateX(4px); }
+
+  .btn.play { --btn-bg: var(--red); border-color: #f2b9bc; }
+  .btn.play small { color: #ffdadc; }
+  .btn.play .ico { background: #7d1218; }
+  .btn.play .cut { fill: #7d1218; }
+  .btn.play:hover, .btn.play:focus-visible { --btn-bg: var(--red-hi); border-color: #fff; }
+  .btn.play .arrow { fill: #fff; }
+  .btn.tiktok .ico { color: #6ee7f2; }
+  .btn.insta .ico { color: #ff7ab6; }
+
+  .press { margin-top: 30px; font-size: 9px; color: var(--gold); text-shadow: 2px 2px 0 #000; animation: blink 1s steps(2) infinite; }
+  footer { margin-top: 20px; font-size: 8px; line-height: 2; color: #dbeadb; text-shadow: 2px 2px 0 #000; }
+
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes pop { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fill { from { width: 0; } }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<video id="bgv" autoplay muted loop playsinline preload="auto" poster="fundo-poster.jpg" aria-hidden="true" tabindex="-1">
+  <source src="fundo.mp4" type="video/mp4">
+</video>
+<div class="veil"></div>
+
+<main>
+  <div class="avatar-wrap">
+    <div class="avatar">
+      <!-- Espada em pixel art (aparece se não houver avatar.png) -->
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="12" y="1" width="2" height="2" fill="#ff5a63"/><rect x="10" y="3" width="2" height="2" fill="#e03a43"/>
+        <rect x="8" y="5" width="2" height="2" fill="#c4262e"/><rect x="6" y="7" width="2" height="2" fill="#a11d25"/>
+        <rect x="11" y="2" width="1" height="1" fill="#ffd0d3"/><rect x="9" y="4" width="1" height="1" fill="#ffd0d3"/>
+        <rect x="3" y="7" width="2" height="2" fill="#e6b84a"/><rect x="5" y="9" width="2" height="2" fill="#e6b84a"/><rect x="4" y="8" width="2" height="2" fill="#e6b84a"/>
+        <rect x="4" y="10" width="2" height="2" fill="#6b4a2b"/><rect x="3" y="11" width="2" height="2" fill="#6b4a2b"/>
+        <rect x="1" y="13" width="2" height="2" fill="#e6b84a"/>
+      </svg>
+      <!-- Para usar sua foto: salve como avatar.png na mesma pasta. Ela aparece sozinha. -->
+      <img src="avatar.png" alt="Avatar do Criador de Jogos 2026" onerror="this.remove()">
+    </div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  </div>
+
+  <h1>Criador de<br>Jogos 2026</h1>
+  <p class="tag">Criando RPGs 2D indie<br>com ajuda de IA</p>
+
+  <div class="status" aria-hidden="true">
+    <div class="row"><span>Fragmentos de Outro Mundo</span><span>EM DEV</span></div>
+    <div class="bar"><i></i></div>
+  </div>
+
+  <nav class="links" aria-label="Links">
+    <a class="btn play" href="https://jairomendes09.github.io/Jogo-2D-Fragmentos-de-Outro-Mundo/" target="_blank" rel="noopener">
+      <span class="ico">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="2" height="12"/><rect x="5" y="3" width="2" height="10"/><rect x="7" y="4" width="2" height="8"/><rect x="9" y="5" width="2" height="6"/><rect x="11" y="6" width="2" height="4"/></svg>
+      </span>
+      <span>JOGAR AGORA<small>Grátis no navegador</small></span>
+      <svg class="arrow" viewBox="0 0 8 8" aria-hidden="true"><rect x="1" y="0" width="2" height="2"/><rect x="3" y="2" width="2" height="2"/><rect x="5" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="2"/><rect x="1" y="7" width="2" height="1"/></svg>
+    </a>
+
+    <a class="btn tiktok" href="https://www.tiktok.com/@criadordejogos2026" target="_blank" rel="noopener">
+      <span class="ico">
+        <!-- Nota musical em pixel art -->
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="8" y="2" width="2" height="9"/><rect x="10" y="3" width="3" height="2"/><rect x="12" y="5" width="2" height="2"/><rect x="5" y="8" width="4" height="1"/><rect x="4" y="9" width="6" height="3"/><rect x="5" y="12" width="4" height="1"/></svg>
+      </span>
+      <span>TIKTOK<small>@criadordejogos2026</small></span>
+      <svg class="arrow" viewBox="0 0 8 8" aria-hidden="true"><rect x="1" y="0" width="2" height="2"/><rect x="3" y="2" width="2" height="2"/><rect x="5" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="2"/><rect x="1" y="7" width="2" height="1"/></svg>
+    </a>
+
+    <a class="btn insta" href="https://www.instagram.com/criadordejogos2026" target="_blank" rel="noopener">
+      <span class="ico">
+        <!-- Câmera em pixel art -->
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="2" width="6" height="2"/><rect x="1" y="4" width="14" height="10"/><rect class="cut" x="5" y="6" width="6" height="6"/><rect x="6" y="7" width="4" height="4"/><rect class="cut" x="12" y="5" width="2" height="1"/></svg>
+      </span>
+      <span>INSTAGRAM<small>@criadordejogos2026</small></span>
+      <svg class="arrow" viewBox="0 0 8 8" aria-hidden="true"><rect x="1" y="0" width="2" height="2"/><rect x="3" y="2" width="2" height="2"/><rect x="5" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="2"/><rect x="1" y="7" width="2" height="1"/></svg>
+    </a>
+  </nav>
+
+  <p class="press">▶ PRESS START</p>
+  <footer>Cenário: Ilha Celeste<br>© 2026 Criador de Jogos</footer>
+</main>
+
+<script>
+  // Quem pediu menos animação no aparelho vê só a imagem parada do jogo
+  (function () {
+    var v = document.getElementById('bgv');
+    if (v && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); }
+  })();
+</script>
+</body>
+</html>
